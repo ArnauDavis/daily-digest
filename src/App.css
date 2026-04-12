@@ -1,0 +1,49 @@
+@import "tailwindcss";
+@plugin "daisyui"{
+  themes: light --default, dark --prefersdark, dracula;
+}
+
+/* KEEPING YOUR LIGHT MODE EXACTLY AS IS */
+@plugin "daisyui/theme" {
+  name: "light";
+  /* Primary: Fresh Water Blue (Hydration) */
+  --color-primary: oklch(65% 0.12 230);
+  --color-primary-content: oklch(98% 0.01 230);
+
+  /* Secondary: Sage Green (Food/Digestion) */
+  --color-secondary: oklch(60% 0.10 145);
+  --color-secondary-content: oklch(98% 0.01 145);
+
+  /* Accent: Muted Amethyst (Restroom/Actions) */
+  --color-accent: oklch(55% 0.12 300);
+  --color-accent-content: oklch(98% 0.01 300);
+
+  /* Base: Soft Oat/Parchment */
+  --color-base-100: oklch(97% 0.01 80);
+  --color-base-200: oklch(92% 0.01 80);
+  --color-base-300: oklch(87% 0.02 80);
+}
+
+/* NEW DARK MODE (DRACULA REPLACEMENT) */
+@plugin "daisyui/theme" {
+  name: "dracula";
+  /* Primary: Softened Pacific Blue - Easier on the eyes in the dark */
+  --color-primary: oklch(70% 0.08 230);
+  --color-primary-content: oklch(20% 0.02 230);
+
+  /* Secondary: Muted Sage Green - Keeps the organic food/digest vibe */
+  --color-secondary: oklch(72% 0.07 145);
+  --color-secondary-content: oklch(20% 0.02 145);
+
+  /* Accent: Dusty Lavender - Distinct action color that isn't jarring */
+  --color-accent: oklch(65% 0.08 300);
+  --color-accent-content: oklch(20% 0.02 300);
+  
+  /* Base: Deep Charcoal Slate - Avoids pure black for a more premium "app" feel */
+  --color-base-100: oklch(25% 0.02 240);
+  --color-base-200: oklch(20% 0.02 240);
+  --color-base-300: oklch(15% 0.02 240);
+  
+  /* Neutral: For borders and subtle dividers */
+  --color-neutral: oklch(35% 0.03 240);
+}
