@@ -106,7 +106,7 @@ const paginatePrev = () => {
 
           <label 
             htmlFor="chronicle-toggle" 
-            className="collapse-title p-6 sm:p-8 flex flex-row items-center justify-between gap-2 cursor-pointer min-h-[100px]"
+            className="collapse-title p-6 sm:p-8 flex flex-row items-center justify-between gap-2 cursor-pointer min-h-25"
           >
             <div className="flex items-center gap-3 sm:gap-5">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary shrink-0">

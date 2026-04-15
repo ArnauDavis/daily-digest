@@ -16,6 +16,9 @@ function App() {
   const [goals, setGoals] = useState(null)
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [peeStat, setPeeStat] = useState([])
+  const [waterStat, setWaterStat] = useState([])
+  const [foodStat, setFoodStat] = useState([])
 
   useEffect(() => {
     // Check current session
@@ -35,9 +38,15 @@ function App() {
   useEffect(() => {
     if (session) {
       getStats()
+      getPeeStats()
+      getWaterStats()
+      getFoodStats()
       getGoals()
     } else {
       setStats([]) // Clear stats on logout
+      setPeeStat([])
+      setWaterStat([])
+      setFoodStat([])
       setGoals(null)
     }
   }, [session])
@@ -52,6 +61,43 @@ function App() {
 
     if (error) console.error(error)
     else setStats(data)
+  }
+
+  //getting pee, water, and food stats
+  async function getPeeStats() {
+    // Filter by the logged-in user's ID
+    const { data, error } = await supabase
+      .from("pee")
+      .select()
+      .eq('user_id', session.user.id) 
+      .order('created_at', { ascending: false })
+
+    if (error) console.error(error)
+    else setPeeStat(data)
+  }
+
+  async function getWaterStats() {
+    // Filter by the logged-in user's ID
+    const { data, error } = await supabase
+      .from("water")
+      .select()
+      .eq('user_id', session.user.id) 
+      .order('created_at', { ascending: false })
+
+    if (error) console.error(error)
+    else setWaterStat(data)
+  }
+
+  async function getFoodStats() {
+    // Filter by the logged-in user's ID
+    const { data, error } = await supabase
+      .from("food")
+      .select()
+      .eq('user_id', session.user.id) 
+      .order('created_at', { ascending: false })
+
+    if (error) console.error(error)
+    else setFoodStat(data)
   }
   
 
@@ -68,9 +114,10 @@ function App() {
       setGoals(data)
     }
   }
+  // end of getting stats and goals
 
 
-
+  // start of setting stats and goals
   async function addStat(newStat) {
     // Automatically attach the user's ID to the new record
     const statWithUser = { ...newStat, user_id: session.user.id }
@@ -84,6 +131,45 @@ function App() {
     else setStats((prev) => [...prev, ...data])
   }
 
+    async function addPeeStat(newStat) {
+    // Automatically attach the user's ID to the new record
+    const statWithUser = { ...newStat, user_id: session.user.id }
+    
+    const { data, error } = await supabase
+      .from("pee")
+      .insert([statWithUser])
+      .select()
+
+    if (error) console.error("Error adding stat:", error)
+    else setPeeStat((prev) => [...prev, ...data])
+  }
+
+    async function addWaterStat(newStat) {
+    // Automatically attach the user's ID to the new record
+    const statWithUser = { ...newStat, user_id: session.user.id }
+    
+    const { data, error } = await supabase
+      .from("water")
+      .insert([statWithUser])
+      .select()
+
+    if (error) console.error("Error adding stat:", error)
+    else setWaterStat((prev) => [...prev, ...data])
+  }
+
+    async function addFoodStat(newStat) {
+    // Automatically attach the user's ID to the new record
+    const statWithUser = { ...newStat, user_id: session.user.id }
+    
+    const { data, error } = await supabase
+      .from("food")
+      .insert([statWithUser])
+      .select()
+
+    if (error) console.error("Error adding stat:", error)
+    else setFoodStat((prev) => [...prev, ...data])
+  }
+
   async function updateStat(statId, newCalories, newProtein, newDate) {
     const { data, error } = await supabase
       .from('stats')
@@ -94,6 +180,48 @@ function App() {
 
     if (error) console.error('Update failed:', error)
     else setStats(prev =>
+        prev.map(stat => (stat.id === statId ? { ...stat, ...data[0] } : stat))
+      )
+  }
+
+  async function updatePeeStat(statId, newPee, newDate) {
+    const { data, error } = await supabase
+      .from('pee')
+      .update({ pee_amount: newPee, created_at: newDate })
+      .eq('id', statId)
+      .eq('user_id', session.user.id) // Security check
+      .select()
+
+    if (error) console.error('Update failed:', error)
+    else setPeeStat(prev =>
+        prev.map(stat => (stat.id === statId ? { ...stat, ...data[0] } : stat))
+      )
+  }
+
+  async function updateWaterStat(statId, newWater, newDate) {
+    const { data, error } = await supabase
+      .from('water')
+      .update({ water_amount: newWater, created_at: newDate })
+      .eq('id', statId)
+      .eq('user_id', session.user.id) // Security check
+      .select()
+
+    if (error) console.error('Update failed:', error)
+    else setWaterStat(prev =>
+        prev.map(stat => (stat.id === statId ? { ...stat, ...data[0] } : stat))
+      )
+  }
+
+  async function updateFoodStat(statId, newFood, newDate) {
+    const { data, error } = await supabase
+      .from('water')
+      .update({ food_amount: newFood, created_at: newDate })
+      .eq('id', statId)
+      .eq('user_id', session.user.id) // Security check
+      .select()
+
+    if (error) console.error('Update failed:', error)
+    else setFoodStat(prev =>
         prev.map(stat => (stat.id === statId ? { ...stat, ...data[0] } : stat))
       )
   }
@@ -115,6 +243,11 @@ function App() {
     }
   }
 
+  //end of updating stats and goals
+
+
+  //start of deleting stats
+
   async function deleteStat(id) {
     const { data, error } = await supabase
       .from("stats")
@@ -125,6 +258,42 @@ function App() {
 
     if (error) console.error(error)
     else setStats(stats.filter(stat => stat.id !== id))
+  }
+
+  async function deletePeeStat(id) {
+    const { data, error } = await supabase
+      .from("pee")
+      .delete()
+      .eq('id', id)
+      .eq('user_id', session.user.id) // Security check
+      .select()
+
+    if (error) console.error(error)
+    else setPeeStat(peeStat.filter(stat => stat.id !== id))
+  }
+
+  async function deleteWaterStat(id) {
+    const { data, error } = await supabase
+      .from("water")
+      .delete()
+      .eq('id', id)
+      .eq('user_id', session.user.id) // Security check
+      .select()
+
+    if (error) console.error(error)
+    else setWaterStat(waterStat.filter(stat => stat.id !== id))
+  }
+
+  async function deleteFoodStat(id) {
+    const { data, error } = await supabase
+      .from("food")
+      .delete()
+      .eq('id', id)
+      .eq('user_id', session.user.id) // Security check
+      .select()
+
+    if (error) console.error(error)
+    else setFoodStat(foodStat.filter(stat => stat.id !== id))
   }
 
   function ScrollToTop() {

@@ -107,7 +107,7 @@ function TotalStats({stats, goals, updateGoals}) {
                   strokeDasharray={2 * Math.PI * 88}
                   strokeDashoffset={2 * Math.PI * 88 * (1 - Math.min(currentProgress.calories / (activeGoals.calories || 1), 1))}
                   strokeLinecap="round"
-                  className="text-secondary transition-all duration-[1500ms] ease-in-out"
+                  className="text-secondary transition-all duration-1500 ease-in-out"
                 />
               </svg>
           
@@ -149,7 +149,7 @@ function TotalStats({stats, goals, updateGoals}) {
                   strokeDasharray={2 * Math.PI * 88}
                   strokeDashoffset={2 * Math.PI * 88 * (1 - Math.min(currentProgress.protein / (activeGoals.protein || 1), 1))}
                   strokeLinecap="round"
-                  className="text-primary transition-all duration-[1500ms] ease-in-out"
+                  className="text-primary transition-all duration-1500 ease-in-out"
                 />
               </svg>
           
