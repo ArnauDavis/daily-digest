@@ -62,7 +62,7 @@ const handleLogin = async (e) => {
   )
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-base-100 p-4">
+    <div className="relative min-h-screen flex mt-24 justify-center bg-base-100 p-4">
   
     {/* Abstract Background Elements - Soft Organic Blobs */}
     <div className="absolute top-[-10%] left-[-10%] w-72 h-72 bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
