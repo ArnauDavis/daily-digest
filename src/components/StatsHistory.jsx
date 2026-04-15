@@ -80,113 +80,173 @@ function StatsHistory({stats, deleteStat, updateStat}) {
     setSortOrder(prev => prev === "desc" ? "asc" : "desc")
   }
 
+ const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 5;
+
+// Calculate indexes
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const currentItems = sortedStats.slice(indexOfFirstItem, indexOfLastItem);
+const totalPages = Math.ceil(sortedStats.length / itemsPerPage);
+
+const paginateNext = () => {
+  if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+};
+
+const paginatePrev = () => {
+  if (currentPage > 1) setCurrentPage(prev => prev - 1);
+};
+
   return (
     <>
       {/* --- ARCHIVES & CHRONICLE SECTION --- */}
-        <div className="w-full max-w-5xl mx-auto my-12 px-4">
-          {/* Section Header */}
-          <div className="flex items-center justify-between mb-8 px-4">
-            <div>
-              <h3 className="text-2xl font-serif font-semibold tracking-tight">Chronicle</h3>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-base-content/40 font-bold mt-1">Historical Data Logs</p>
+      <div className="w-full max-w-5xl mx-auto my-12 px-2 sm:px-4">
+        <div className="collapse bg-base-100 border border-base-content/10 rounded-[2.5rem] shadow-sm transition-all duration-500 ease-in-out hover:shadow-md overflow-hidden">
+          <input type="checkbox" className="peer" id="chronicle-toggle" />
+
+          <label 
+            htmlFor="chronicle-toggle" 
+            className="collapse-title p-6 sm:p-8 flex flex-row items-center justify-between gap-2 cursor-pointer min-h-[100px]"
+          >
+            <div className="flex items-center gap-3 sm:gap-5">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 transition-transform peer-checked:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                </svg>
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-lg sm:text-xl font-serif font-semibold tracking-tight truncate">Chronicle</h3>
+                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-base-content/40 mt-1 font-bold">Data Logs</p>
+              </div>
             </div>
-            <div className="bg-base-200/50 px-4 py-2 rounded-full border border-base-content/5">
-              <span className="text-[10px] uppercase font-black tracking-widest opacity-40">
-                {sortedStats.length} Entries
+
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+              <div className="flex items-center justify-center bg-base-200/50 px-3 py-1.5 rounded-full border border-base-content/5">
+                <span className="text-[9px] sm:text-[10px] uppercase font-black tracking-widest opacity-40">
+                  {sortedStats.length} Total
+                </span>
+              </div>
+              <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-secondary bg-secondary/5 px-3 py-2 sm:px-4 sm:py-2 rounded-full border border-secondary/10">
+                Archives
               </span>
             </div>
-          </div>
-          
-          {/* Table Container */}
-          <div className="overflow-x-auto bg-base-100 rounded-[2.5rem] border border-base-content/5 shadow-sm">
-            <table className="table w-full border-separate border-spacing-y-0">
-              <thead className="bg-base-200/50">
-                <tr className="border-none">
-                  <th 
-                    className="py-6 px-8 font-black uppercase tracking-[0.2em] text-[10px] opacity-40 cursor-pointer hover:text-primary transition-colors select-none"
-                    onClick={toggleSort}
-                  >
-                    <div className="flex items-center gap-2">
-                      Timeline
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        viewBox="0 0 20 20" 
-                        fill="currentColor" 
-                        className={`w-3.5 h-3.5 transition-transform duration-500 ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
-                      >
-                        <path fillRule="evenodd" d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </th>
-                  <th className="font-black uppercase tracking-[0.2em] text-[10px] opacity-40 text-center">Fuel</th>
-                  <th className="font-black uppercase tracking-[0.2em] text-[10px] opacity-40 text-center">Build</th>
-                  <th className="w-24 px-8"></th>
-                </tr>
-              </thead>
-          
-              <tbody className="text-base-content/80">
-                {sortedStats.map((stat) => (
-                  <tr key={stat.id} className="group hover:bg-base-200/30 transition-all duration-300">
-                    {/* Timeline Column */}
-                    <td className="py-5 px-8">
-                      <div className="flex flex-col">
-                        <span className="font-mono text-sm font-bold tracking-tight text-base-content">
-                          {new Date(stat.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        <span className="text-[10px] font-bold opacity-30 uppercase tracking-tighter">
-                          {new Date(stat.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </span>
+          </label>
+
+          <div className="collapse-content px-0">
+            <div className="overflow-x-auto border-t border-base-content/5">
+              <table className="table w-full border-separate border-spacing-y-0 table-fixed sm:table-auto">
+                <thead className="bg-base-200/50">
+                  <tr className="border-none">
+                    <th 
+                      className="py-5 px-4 sm:px-8 font-black uppercase tracking-widest text-[9px] sm:text-[10px] opacity-40 cursor-pointer hover:text-primary transition-colors select-none w-[40%] sm:w-auto"
+                      onClick={(e) => { e.stopPropagation(); toggleSort(); }}
+                    >
+                      <div className="flex items-center gap-2">
+                        Time
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`w-3 h-3 transition-transform duration-500 ${sortOrder === 'asc' ? 'rotate-180' : ''}`}>
+                          <path fillRule="evenodd" d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z" clipRule="evenodd" />
+                        </svg>
                       </div>
-                    </td>
-                  
-                    {/* Calories (Fuel) */}
-                    <td className="text-center">
-                      <div className="flex flex-col items-center">
-                        <span className="font-serif text-lg text-primary font-medium">
-                          {stat.calories}
-                        </span>
-                        <span className="text-[9px] uppercase font-black opacity-20 tracking-widest">kcal</span>
-                      </div>
-                    </td>
-                  
-                    {/* Protein (Build) */}
-                    <td className="text-center">
-                      <div className="flex flex-col items-center">
-                        <span className="font-serif text-lg text-secondary font-medium">
-                          {stat.protein}
-                        </span>
-                        <span className="text-[9px] uppercase font-black opacity-20 tracking-widest">grams</span>
-                      </div>
-                    </td>
-                  
-                    {/* Actions: Responsive Visibility */}
-                    <td className="px-6 sm:px-8 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-40 sm:opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <button 
-                          className="btn btn-ghost btn-circle btn-xs hover:bg-primary/10 hover:text-primary transition-colors"
-                          onClick={() => handleEditClick(stat)}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                          </svg>
-                        </button>
-                  
-                        <button 
-                          className="btn btn-ghost btn-circle btn-xs hover:bg-error/10 hover:text-error transition-colors"
-                          onClick={() => prepDelete(stat)}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
+                    </th>
+                    <th className="font-black uppercase tracking-widest text-[9px] sm:text-[10px] opacity-40 text-center">Fuel</th>
+                    <th className="font-black uppercase tracking-widest text-[9px] sm:text-[10px] opacity-40 text-center">Build</th>
+                    <th className="px-4 sm:px-8 w-24"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody className="text-base-content/80">
+                  {currentItems.map((stat) => (
+                    <tr key={stat.id} className="hover:bg-base-200/30 transition-all duration-300 border-b border-base-content/5 last:border-none">
+                      <td className="py-4 px-4 sm:px-8">
+                        <div className="flex flex-col">
+                          <span className="font-mono text-xs sm:text-sm font-bold text-base-content">
+                            {new Date(stat.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          <span className="text-[8px] sm:text-[10px] font-bold opacity-30 uppercase tracking-tighter">
+                            {new Date(stat.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="text-center">
+                        <div className="flex flex-col">
+                          <span className="font-serif text-sm sm:text-lg text-primary font-medium">{stat.calories}</span>
+                          <span className="text-[8px] uppercase font-black opacity-20">kcal</span>
+                        </div>
+                      </td>
+                      <td className="text-center">
+                        <div className="flex flex-col">
+                          <span className="font-serif text-sm sm:text-lg text-secondary font-medium">{stat.protein}</span>
+                          <span className="text-[8px] uppercase font-black opacity-20">g</span>
+                        </div>
+                      </td>
+                      <td className="px-2 sm:px-8 text-right">
+                        <div className="flex flex-col sm:flex-row items-center justify-end gap-1 sm:gap-2 opacity-80">
+                          <button 
+                            className="btn btn-ghost btn-circle btn-xs sm:btn-sm hover:bg-primary/10 hover:text-primary"
+                            onClick={(e) => { e.stopPropagation(); handleEditClick(stat); }}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5 sm:w-4 sm:h-4">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                            </svg>
+                          </button>
+                          <button 
+                            className="btn btn-ghost btn-circle btn-xs sm:btn-sm hover:bg-error/10 hover:text-error"
+                            onClick={(e) => { e.stopPropagation(); prepDelete(stat); }}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5 sm:w-4 sm:h-4">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+                
+              {/* --- IN-PLACE SCROLL CONTROLS --- */}
+              <div className="py-6 border-t border-base-content/5 flex items-center justify-between px-8 bg-base-200/10">
+                <button 
+                  onClick={paginatePrev}
+                  disabled={currentPage === 1}
+                  className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-base-content/40 hover:text-secondary disabled:opacity-10 transition-all"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 group-hover:-translate-x-1 transition-transform">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                  <span>Prev</span>
+                </button>
+                
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary">
+                    Page {currentPage} / {totalPages || 1}
+                  </span>
+                  <div className="flex gap-1 mt-1">
+                    {[...Array(totalPages)].map((_, i) => (
+                      <div 
+                        key={i} 
+                        className={`h-1 rounded-full transition-all ${currentPage === i + 1 ? 'w-4 bg-secondary' : 'w-1 bg-base-content/10'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                  
+                <button 
+                  onClick={paginateNext}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-base-content/40 hover:text-secondary disabled:opacity-10 transition-all"
+                >
+                  <span>Next</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 group-hover:translate-x-1 transition-transform">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+              
               
         {/* --- MODAL: EDIT ENTRY --- */}
         <dialog id="edit_modal" className="modal backdrop-blur-md">

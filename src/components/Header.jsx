@@ -7,6 +7,14 @@ function Header({session}) {
     const { error } = await supabase.auth.signOut()
     if (error) console.error("Error logging out:", error.message)
   }
+  
+  const closeDropdown = () => {
+    const elem = document.activeElement
+    if (elem) {
+      elem.blur()
+    }
+
+  }
   return (
     <>
       <div className="sticky top-0 z-50 w-full px-4 pt-4">
@@ -27,9 +35,9 @@ function Header({session}) {
                   tabIndex={0}
                   className="menu menu-md dropdown-content mt-4 w-64 p-3 shadow-2xl rounded-[1.5rem] border border-white/20 bg-base-100/95 backdrop-blur-3xl animate-in fade-in slide-in-from-top-2">
                   <li className="menu-title text-[10px] uppercase tracking-[0.2em] opacity-40 mb-2">Navigation</li>
-                  <li><Link to={`/`} className="rounded-xl py-3 hover:bg-primary/10 font-medium">Dashboard</Link></li>
-                  <li><Link to={`/addstats`} className="rounded-xl py-3 hover:bg-primary/10 font-medium">Add Entry</Link></li>
-                  <li><Link to={`/stats`} className="rounded-xl py-3 hover:bg-primary/10 font-medium">Daily History</Link></li>
+                  <li><Link to={`/`} className="rounded-xl py-3 hover:bg-primary/10 font-medium" onClick={closeDropdown}>Dashboard</Link></li>
+                  <li><Link to={`/addstats`} className="rounded-xl py-3 hover:bg-primary/10 font-medium" onClick={closeDropdown}>Add Entry</Link></li>
+                  <li><Link to={`/stats`} className="rounded-xl py-3 hover:bg-primary/10 font-medium" onClick={closeDropdown}>Daily History</Link></li>
             
                   <div className="divider my-2 opacity-5"></div>
                   
