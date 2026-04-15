@@ -18,7 +18,7 @@ function Header({session}) {
   return (
     <>
       <div className="sticky top-0 z-50 w-full px-4 pt-4">
-        <div className="navbar glass min-h-[70px] rounded-[2rem] border border-white/20 shadow-xl px-6 backdrop-blur-2xl bg-base-100/40">
+        <div className="navbar glass min-h-17.5 rounded-4xl border border-white/20 shadow-xl px-6 backdrop-blur-2xl bg-base-100/40">
           
           {/* Navigation Start: Discreet & Minimal */}
           <div className="navbar-start">
@@ -33,7 +33,7 @@ function Header({session}) {
                 </div>
                 <ul
                   tabIndex={0}
-                  className="menu menu-md dropdown-content mt-4 w-64 p-3 shadow-2xl rounded-[1.5rem] border border-white/20 bg-base-100/95 backdrop-blur-3xl animate-in fade-in slide-in-from-top-2">
+                  className="menu menu-md dropdown-content mt-4 w-64 p-3 shadow-2xl rounded-3xl border border-white/20 bg-base-100/95 backdrop-blur-3xl animate-in fade-in slide-in-from-top-2">
                   <li className="menu-title text-[10px] uppercase tracking-[0.2em] opacity-40 mb-2">Navigation</li>
                   <li><Link to={`/`} className="rounded-xl py-3 hover:bg-primary/10 font-medium" onClick={closeDropdown}>Dashboard</Link></li>
                   <li><Link to={`/addstats`} className="rounded-xl py-3 hover:bg-primary/10 font-medium" onClick={closeDropdown}>Add Entry</Link></li>
