@@ -135,57 +135,84 @@ function StatsHistory() {
 }
 
 function LogSection({ title, subtitle, data, valKey, unit, color, onEdit, onDelete, isString }) {
+  //state to track if the section is open or closed
+  const [isOpen, setIsOpen] = useState(false) 
   const [currentPage, setCurrentPage] = useState(1)
+  
   const itemsPerPage = 5
   const totalPages = Math.ceil(data.length / itemsPerPage)
   const currentItems = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   return (
-    <div className="bg-base-100 border border-base-content/10 rounded-[2.5rem] shadow-sm overflow-hidden">
-      <div className="p-8 flex items-center justify-between bg-base-200/20 border-b border-base-content/5">
+    <div className="bg-base-100 border border-base-content/10 rounded-[2.5rem] shadow-sm overflow-hidden transition-all duration-300">
+      
+      {/* make the header clickable */}
+      <div 
+        onClick={() => setIsOpen(!isOpen)} 
+        className="p-8 flex items-center justify-between bg-base-200/20 border-b border-base-content/5 cursor-pointer hover:bg-base-200/40 transition-colors"
+      >
         <div>
-          <h3 className="text-xl font-serif font-semibold">{title}</h3>
+          <h3 className="text-xl font-serif font-semibold flex items-center gap-3">
+            {title}
+            {/* animated arrow indicator */}
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className={`h-5 w-5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} 
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </h3>
           <p className="text-[10px] uppercase tracking-widest text-base-content/40 font-bold">{subtitle}</p>
         </div>
-        <div className="badge badge-ghost p-4 font-black text-[10px] opacity-40 uppercase tracking-widest">{data.length} Total</div>
+        <div className="badge badge-ghost p-4 font-black text-[10px] opacity-40 uppercase tracking-widest">
+          {data.length} Total
+        </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="table w-full">
-          <thead>
-            <tr className="bg-base-200/30 text-[9px] uppercase tracking-widest opacity-40">
-              <th className="py-4 pl-8">Time</th>
-              <th className="text-center">Log</th>
-              <th className="pr-8 text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.map((item) => (
-              <tr key={item.id} className="hover:bg-base-200/30 border-b border-base-content/5 last:border-none transition-all">
-                <td className="py-4 pl-8">
-                  <div className="flex flex-col">
-                    <span className="font-mono text-xs font-bold">{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    <span className="text-[8px] opacity-30 uppercase font-black">{new Date(item.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
-                  </div>
-                </td>
-                <td className="text-center">
-                  <span className={`font-serif ${isString ? 'text-xs italic' : 'text-lg'} font-medium ${color}`}>
-                    {item[valKey]} <span className="text-[10px] opacity-30 ml-1">{unit}</span>
-                  </span>
-                </td>
-                <td className="pr-8 text-right space-x-2">
-                  <button onClick={() => onEdit(item)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100">✎</button>
-                  <button onClick={() => onDelete(item.id)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 hover:text-error">✕</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {totalPages > 1 && (
-        <div className="p-4 flex items-center justify-between bg-base-200/10 border-t border-base-content/5 px-8">
-          <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="text-[10px] font-black uppercase tracking-widest disabled:opacity-10">Prev</button>
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30">Page {currentPage} / {totalPages}</span>
-          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="text-[10px] font-black uppercase tracking-widest disabled:opacity-10">Next</button>
+
+      {/* Wrap the table and pagination in a conditional render */}
+      {isOpen && (
+        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="overflow-x-auto">
+            <table className="table w-full">
+              <thead>
+                <tr className="bg-base-200/30 text-[9px] uppercase tracking-widest opacity-40">
+                  <th className="py-4 pl-8">Time</th>
+                  <th className="text-center">Log</th>
+                  <th className="pr-8 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentItems.map((item) => (
+                  <tr key={item.id} className="hover:bg-base-200/30 border-b border-base-content/5 last:border-none transition-all">
+                    <td className="py-4 pl-8">
+                      <div className="flex flex-col">
+                        <span className="font-mono text-xs font-bold">{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="text-[8px] opacity-30 uppercase font-black">{new Date(item.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
+                      </div>
+                    </td>
+                    <td className="text-center">
+                      <span className={`font-serif ${isString ? 'text-xs italic' : 'text-lg'} font-medium ${color}`}>
+                        {item[valKey]} <span className="text-[10px] opacity-30 ml-1">{unit}</span>
+                      </span>
+                    </td>
+                    <td className="pr-8 text-right space-x-2">
+                      <button onClick={() => onEdit(item)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100">✎</button>
+                      <button onClick={() => onDelete(item.id)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 hover:text-error">✕</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div className="p-4 flex items-center justify-between bg-base-200/10 border-t border-base-content/5 px-8">
+              <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="text-[10px] font-black uppercase tracking-widest disabled:opacity-10">Prev</button>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30">Page {currentPage} / {totalPages}</span>
+              <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="text-[10px] font-black uppercase tracking-widest disabled:opacity-10">Next</button>
+            </div>
+          )}
         </div>
       )}
     </div>
