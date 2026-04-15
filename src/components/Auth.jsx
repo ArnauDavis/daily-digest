@@ -34,7 +34,7 @@ const handleLogin = async (e) => {
           alert(signUpError.message)
         }
       } else {
-        alert('Account created! Welcome to Gutz.')
+        alert('Account created! Welcome to Daily Digest.')
       }
     } else {
       // Handle other errors (like rate limits or server issues)

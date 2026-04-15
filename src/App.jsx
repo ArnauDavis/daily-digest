@@ -8,6 +8,7 @@ import Auth from "./components/Auth.jsx"
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import TotalStats from './components/TotalStats.jsx'
+import DailyStats from "./components/DailyStats.jsx"
 import StatChange from './components/StatChange.jsx'
 import StatsHistory from "./components/StatsHistory.jsx"
 import UpdateGoals from './components/UpdateGoals.jsx'
@@ -54,8 +55,9 @@ function App() {
               <Routes>
                 <Route path="/" element={
                   <>
-                    <TotalStats />
+                    <DailyStats/>
                     <StatChange />
+                    <TotalStats />
                     <UpdateGoals />
                   </>
                 } />

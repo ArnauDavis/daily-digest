@@ -47,6 +47,11 @@ function TotalStats() {
   return (
     <>
       <div className="w-full max-w-4xl mx-auto my-12 px-6">
+        <div className="flex items-center gap-4 mb-10">
+          <div className="h-px flex-1 bg-base-content/5"></div>
+          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-base-content/20">Goals</span>
+          <div className="h-px flex-1 bg-base-content/5"></div>
+        </div>
         <div className="flex justify-center mb-12">
           <div className="bg-base-200/50 p-1 rounded-full flex items-center border border-base-content/5">
             {['daily', 'weekly'].map((v) => (
