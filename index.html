@@ -3,33 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Daily Digest</title>
-
-    <script 
-      src="https://cdn.jsdelivr.net/npm/eruda" 
-      crossorigin="anonymous">
-    </script>
-    <script>
-      try {
-        eruda.init();
-        console.log("Eruda initialized successfully");
-      } catch (e) {
-        // This will pop up on your iPhone screen if the script crashes
-        alert("Eruda Load Error: " + e.message);
-      }
-    </script>
-    <style>
-      /* Ensure the gear is always on top and clickable */
-      #eruda {
-        z-index: 99999 !important;
-      }
-      /* Prevent Safari from blocking clicks on the bottom of the screen */
-      html, body {
-        height: 100%;
-        touch-action: manipulation;
-      }
-    </style>
   </head>
   <body>
     <div id="root"></div>
