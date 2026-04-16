@@ -1,34 +1,46 @@
-import React, { useState } from "react"
+import React, { useState, memo } from "react"
 import { useStats } from "../context/StatsContext.jsx"
 
 function StatChange() {
   const { addPeeStat, addWaterStat, addFoodStat } = useStats()
 
-  // Local states for the three different inputs
+  // Local states for inputs
   const [peeAmount, setPeeAmount] = useState("")
   const [waterAmount, setWaterAmount] = useState("")
   const [foodItem, setFoodItem] = useState("")
 
-  // Specific Handlers
+  // Success states for visual feedback
+  const [success, setSuccess] = useState({ pee: false, water: false, food: false })
+
+  const triggerSuccess = (type) => {
+    setSuccess(prev => ({ ...prev, [type]: true }))
+    setTimeout(() => setSuccess(prev => ({ ...prev, [type]: false })), 2000)
+  }
+
   const handlePeeSubmit = async (e) => {
     e.preventDefault()
-    if (!peeAmount) return
-    await addPeeStat({ pee_amount: Number(peeAmount) })
+    const val = parseFloat(peeAmount)
+    if (isNaN(val) || val <= 0) return
+    await addPeeStat({ pee_amount: val })
     setPeeAmount("")
+    triggerSuccess('pee')
   }
 
   const handleWaterSubmit = async (e) => {
     e.preventDefault()
-    if (!waterAmount) return
-    await addWaterStat({ water_amount: Number(waterAmount) })
+    const val = parseFloat(waterAmount)
+    if (isNaN(val) || val <= 0) return
+    await addWaterStat({ water_amount: val })
     setWaterAmount("")
+    triggerSuccess('water')
   }
 
   const handleFoodSubmit = async (e) => {
     e.preventDefault()
-    if (!foodItem) return
+    if (!foodItem.trim()) return
     await addFoodStat({ food_amount: foodItem })
     setFoodItem("")
+    triggerSuccess('food')
   }
 
   return (
@@ -48,19 +60,26 @@ function StatChange() {
         {/* PEE CARD */}
         <form onSubmit={handlePeeSubmit} className="group relative bg-base-200/30 p-8 rounded-[3rem] border border-transparent hover:border-yellow-500/20 transition-all duration-500">
           <div className="flex justify-between items-start mb-8">
-            <div className="p-3 bg-yellow-500/10 rounded-2xl text-yellow-600">
+            <div className={`p-3 rounded-2xl transition-colors duration-500 ${success.pee ? 'bg-success text-white' : 'bg-yellow-500/10 text-yellow-600'}`}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547" />
               </svg>
             </div>
-            <button type="submit" className="btn btn-ghost btn-circle btn-sm opacity-100 transition-all">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
-              </svg>
+            <button type="submit" className={`btn btn-circle btn-sm transition-all duration-300 ${success.pee ? 'btn-success text-white scale-110' : 'btn-ghost'}`}>
+              {success.pee ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
+                </svg>
+              )}
             </button>
           </div>
           <input
             type="number"
+            inputMode="decimal"
             placeholder="0"
             className="w-full bg-transparent text-5xl font-serif outline-none placeholder:text-base-content/5"
             value={peeAmount}
@@ -72,19 +91,26 @@ function StatChange() {
         {/* WATER CARD */}
         <form onSubmit={handleWaterSubmit} className="group relative bg-base-200/30 p-8 rounded-[3rem] border border-transparent hover:border-blue-500/20 transition-all duration-500">
           <div className="flex justify-between items-start mb-8">
-            <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-600">
+            <div className={`p-3 rounded-2xl transition-colors duration-500 ${success.water ? 'bg-success text-white' : 'bg-blue-500/10 text-blue-600'}`}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2 2v2" />
               </svg>
             </div>
-            <button type="submit" className="btn btn-ghost btn-circle btn-sm opacity-100 transition-all">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
-              </svg>
+            <button type="submit" className={`btn btn-circle btn-sm transition-all duration-300 ${success.water ? 'btn-success text-white scale-110' : 'btn-ghost'}`}>
+              {success.water ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
+                </svg>
+              )}
             </button>
           </div>
           <input
             type="number"
+            inputMode="decimal"
             placeholder="0"
             className="w-full bg-transparent text-5xl font-serif outline-none placeholder:text-base-content/5"
             value={waterAmount}
@@ -96,15 +122,21 @@ function StatChange() {
         {/* FOOD CARD */}
         <form onSubmit={handleFoodSubmit} className="group relative bg-base-200/30 p-8 rounded-[3rem] border border-transparent hover:border-green-500/20 transition-all duration-500">
           <div className="flex justify-between items-start mb-8">
-            <div className="p-3 bg-green-500/10 rounded-2xl text-green-600">
+            <div className={`p-3 rounded-2xl transition-colors duration-500 ${success.food ? 'bg-success text-white' : 'bg-green-500/10 text-green-600'}`}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h6a2 2 0 012 2v11a2 2 0 01-2 2H9a2 2 0 01-2-2V5a2 2 0 012-2z" />
               </svg>
             </div>
-            <button type="submit" className="btn btn-ghost btn-circle btn-sm opacity-100 transition-all">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
-              </svg>
+            <button type="submit" className={`btn btn-circle btn-sm transition-all duration-300 ${success.food ? 'btn-success text-white scale-110' : 'btn-ghost'}`}>
+              {success.food ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
+                </svg>
+              )}
             </button>
           </div>
           <input
@@ -126,4 +158,4 @@ function StatChange() {
   )
 }
 
-export default StatChange
+export default memo(StatChange)
