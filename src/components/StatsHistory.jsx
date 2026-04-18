@@ -1,7 +1,7 @@
 import React, { useState, useMemo, memo } from 'react'
 import { useStats } from '../context/StatsContext.jsx'
 
-// Helper moved outside to prevent re-creation
+// Helper to format date for the datetime-local input
 const formatForInput = (timestamp) => {
   if (!timestamp) return ""
   const d = new Date(timestamp)
@@ -9,28 +9,43 @@ const formatForInput = (timestamp) => {
   return new Date(d.getTime() - offset).toISOString().slice(0, 16)
 }
 
-// Memoized Individual Row to prevent re-rendering the whole table
+// Memoized Individual Row
 const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) => {
   const dateObj = new Date(item.created_at)
   const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   const dateStr = dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' })
 
+  // Check if this is a "Net Balance" row (which doesn't have a specific time)
+  const isNetRow = !onEdit && !onDelete
+
+  // If it's a number and it's negative, force it to red
+  const value = item[valKey]
+  const isNegative = !isString && parseFloat(value) < 0
+  const displayColor = isNegative ? "text-error" : color
+
   return (
     <tr className="hover:bg-base-200/30 border-b border-base-content/5 last:border-none transition-all">
       <td className="py-4 pl-8">
         <div className="flex flex-col">
-          <span className="font-mono text-xs font-bold">{timeStr}</span>
+          <span className="font-mono text-xs font-bold">{isNetRow ? 'Daily' : timeStr}</span>
           <span className="text-[8px] opacity-30 uppercase font-black">{dateStr}</span>
         </div>
       </td>
       <td className="text-center">
-        <span className={`font-serif ${isString ? 'text-xs italic' : 'text-lg'} font-medium ${color}`}>
+        <span className={`font-serif ${isString ? 'text-xs italic' : 'text-lg'} font-medium ${displayColor}`}>
           {item[valKey]} <span className="text-[10px] opacity-30 ml-1">{unit}</span>
         </span>
       </td>
       <td className="pr-8 text-right space-x-2">
-        <button onClick={() => onEdit(item)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100">✎</button>
-        <button onClick={() => onDelete(item.id)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 hover:text-error">✕</button>
+        {onEdit && (
+          <button onClick={() => onEdit(item)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100">✎</button>
+        )}
+        {onDelete && (
+          <button onClick={() => onDelete(item.id)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 hover:text-error">✕</button>
+        )}
+        {isNetRow && (
+          <span className="text-[10px] opacity-20 font-black uppercase tracking-tighter">Summary</span>
+        )}
       </td>
     </tr>
   )
@@ -41,7 +56,6 @@ function LogSection({ title, subtitle, data, valKey, unit, color, onEdit, onDele
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 
-  // Memoize pagination calculations
   const { currentItems, totalPages } = useMemo(() => {
     const total = Math.ceil(data.length / itemsPerPage)
     const items = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
@@ -68,7 +82,7 @@ function LogSection({ title, subtitle, data, valKey, unit, color, onEdit, onDele
           <p className="text-[10px] uppercase tracking-widest text-base-content/40 font-bold">{subtitle}</p>
         </div>
         <div className="badge badge-ghost p-4 font-black text-[10px] opacity-40 uppercase tracking-widest">
-          {data.length} Total
+          {data.length} {data.length === 1 ? 'Entry' : 'Total'}
         </div>
       </div>
 
@@ -135,9 +149,32 @@ function StatsHistory() {
   const [editingItem, setEditingItem] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [activeType, setActiveType] = useState("") 
-  
   const [tempValue, setTempValue] = useState("")
   const [tempDate, setTempDate] = useState("")
+
+  // --- HYDRATION BALANCE CALCULATION ---
+  const netFluidData = useMemo(() => {
+    const totals = {};
+
+    waterStat.forEach(entry => {
+      const date = new Date(entry.created_at).toLocaleDateString();
+      totals[date] = (totals[date] || 0) + parseFloat(entry.water_amount || 0);
+    });
+
+    peeStat.forEach(entry => {
+      const date = new Date(entry.created_at).toLocaleDateString();
+      totals[date] = (totals[date] || 0) - parseFloat(entry.pee_amount || 0);
+    });
+
+    return Object.entries(totals)
+      .map(([date, net]) => ({
+        id: `net-${date}`, 
+        created_at: date, 
+        net_amount: net > 0 ? `+${net.toFixed(1)}` : net.toFixed(1)
+      }))
+      .filter(item => parseFloat(item.net_amount) !== 0)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  }, [peeStat, waterStat]);
 
   const handleEditOpen = (item, type) => {
     setActiveType(type)
@@ -170,27 +207,46 @@ function StatsHistory() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10 space-y-16">
+      
+      {/* Net Balance (Calculated) */}
+      <div className="bg-primary/5 p-1 rounded-[2.5rem]">
+        <LogSection 
+          title="Net Fluid Balance" 
+          subtitle="Daily Hydration Differential" 
+          data={netFluidData} 
+          valKey="net_amount" 
+          unit="oz" 
+          color="text-primary font-bold italic" 
+          onEdit={null} 
+          onDelete={null} 
+        />
+      </div>
+
+      {/* Pee Logs */}
       <LogSection 
-        title="Pee Logs" subtitle="Output" data={peeStat} valKey="pee_amount" 
+        title="Pee Logs" subtitle="Output Tracking" data={peeStat} valKey="pee_amount" 
         unit="oz" color="text-yellow-500" 
         onEdit={(item) => handleEditOpen(item, "pee")}
         onDelete={(id) => handleDeleteOpen(id, "pee")}
       />
 
+      {/* Water Intake */}
       <LogSection 
-        title="Water Intake" subtitle="Hydration" data={waterStat} valKey="water_amount" 
+        title="Water Intake" subtitle="Hydration Log" data={waterStat} valKey="water_amount" 
         unit="oz" color="text-blue-500" 
         onEdit={(item) => handleEditOpen(item, "water")}
         onDelete={(id) => handleDeleteOpen(id, "water")}
       />
 
+      {/* Food Journal */}
       <LogSection 
-        title="Food Journal" subtitle="Inputs" data={foodStat} valKey="food_amount" 
+        title="Food Journal" subtitle="Nutrition Entry" data={foodStat} valKey="food_amount" 
         unit="" color="text-success" isString={true}
         onEdit={(item) => handleEditOpen(item, "food")}
         onDelete={(id) => handleDeleteOpen(id, "food")}
       />
 
+      {/* Edit Modal */}
       <dialog id="edit_modal" className="modal backdrop-blur-md">
         <div className="modal-box bg-base-100 border border-base-content/10 p-10 rounded-[2.5rem] shadow-2xl max-w-md">
           <div className="text-center mb-8">
@@ -216,6 +272,7 @@ function StatsHistory() {
         </div>
       </dialog>
 
+      {/* Delete Confirmation Modal */}
       <dialog id="delete_confirm_modal" className="modal backdrop-blur-md">
         <div className="modal-box border border-error/10 bg-base-100 p-10 rounded-[2.5rem] shadow-2xl max-sm text-center">
           <h3 className="font-serif text-2xl font-semibold mb-2">Erase Record?</h3>
