@@ -15,12 +15,12 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
   const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   const dateStr = dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' })
 
-  // Check if this is a "Net Balance" row (which doesn't have a specific time)
   const isNetRow = !onEdit && !onDelete
 
-  // If it's a number and it's negative, force it to red
+  // negative detection logic
   const value = item[valKey]
-  const isNegative = !isString && parseFloat(value) < 0
+  const numericValue = parseFloat(value)
+  const isNegative = !isString && numericValue < 0
   const displayColor = isNegative ? "text-error" : color
 
   return (
@@ -33,7 +33,7 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
       </td>
       <td className="text-center">
         <span className={`font-serif ${isString ? 'text-xs italic' : 'text-lg'} font-medium ${displayColor}`}>
-          {item[valKey]} <span className="text-[10px] opacity-30 ml-1">{unit}</span>
+          {value} <span className="text-[10px] opacity-30 ml-1">{unit}</span>
         </span>
       </td>
       <td className="pr-8 text-right space-x-2">
@@ -44,7 +44,7 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
           <button onClick={() => onDelete(item.id)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 hover:text-error">✕</button>
         )}
         {isNetRow && (
-          <span className="text-[10px] opacity-20 font-black uppercase tracking-tighter">Summary</span>
+          <span className="text-[10px] opacity-20 font-black uppercase tracking-tighter italic">Net Balance</span>
         )}
       </td>
     </tr>
@@ -92,8 +92,8 @@ function LogSection({ title, subtitle, data, valKey, unit, color, onEdit, onDele
             <table className="table w-full">
               <thead>
                 <tr className="bg-base-200/30 text-[9px] uppercase tracking-widest opacity-40">
-                  <th className="py-4 pl-8">Time</th>
-                  <th className="text-center">Log</th>
+                  <th className="py-4 pl-8">Date</th>
+                  <th className="text-center">Record</th>
                   <th className="pr-8 text-right">Action</th>
                 </tr>
               </thead>
@@ -172,7 +172,6 @@ function StatsHistory() {
         created_at: date, 
         net_amount: net > 0 ? `+${net.toFixed(1)}` : net.toFixed(1)
       }))
-      .filter(item => parseFloat(item.net_amount) !== 0)
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }, [peeStat, waterStat]);
 
@@ -206,7 +205,7 @@ function StatsHistory() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10 space-y-16">
+    <div className="max-w-5xl mx-auto px-4 py-10 space-y-12">
       <div className="flex flex-col mb-12 ml-4">
         <span className="text-secondary font-bold tracking-[0.3em] text-[10px] uppercase mb-2">
           Historical Data
@@ -215,21 +214,19 @@ function StatsHistory() {
           Pattern <span className="italic font-normal text-primary">Recognition.</span>
         </h2>
       </div>
-      {/* Net Balance (Calculated) */}
-      <div className="bg-primary/5 p-1 rounded-[2.5rem]">
-        <LogSection 
-          title="Net Fluid Balance" 
-          subtitle="Daily Hydration Differential" 
-          data={netFluidData} 
-          valKey="net_amount" 
-          unit="oz" 
-          color="text-primary font-bold italic" 
-          onEdit={null} 
-          onDelete={null} 
-        />
-      </div>
 
-      {/* Pee Logs */}
+      {/* Net Balance (Calculated) */}
+      <LogSection 
+        title="Hydration Balance" 
+        subtitle="Daily Net Differential (In vs Out)" 
+        data={netFluidData} 
+        valKey="net_amount" 
+        unit="oz" 
+        color="text-primary font-bold italic" 
+        onEdit={null} 
+        onDelete={null} 
+      />
+
       <LogSection 
         title="Pee Logs" subtitle="Output Tracking" data={peeStat} valKey="pee_amount" 
         unit="oz" color="text-yellow-500" 
@@ -237,7 +234,6 @@ function StatsHistory() {
         onDelete={(id) => handleDeleteOpen(id, "pee")}
       />
 
-      {/* Water Intake */}
       <LogSection 
         title="Water Intake" subtitle="Hydration Log" data={waterStat} valKey="water_amount" 
         unit="oz" color="text-blue-500" 
@@ -245,7 +241,6 @@ function StatsHistory() {
         onDelete={(id) => handleDeleteOpen(id, "water")}
       />
 
-      {/* Food Journal */}
       <LogSection 
         title="Food Journal" subtitle="Nutrition Entry" data={foodStat} valKey="food_amount" 
         unit="" color="text-success" isString={true}
