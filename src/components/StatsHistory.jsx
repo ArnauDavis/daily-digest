@@ -207,7 +207,14 @@ function StatsHistory() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10 space-y-16">
-      
+      <div className="flex flex-col mb-12 ml-4">
+        <span className="text-secondary font-bold tracking-[0.3em] text-[10px] uppercase mb-2">
+          Historical Data
+        </span>
+        <h2 className="text-5xl font-serif font-light text-base-content leading-tight">
+          Pattern <span className="italic font-normal text-primary">Recognition.</span>
+        </h2>
+      </div>
       {/* Net Balance (Calculated) */}
       <div className="bg-primary/5 p-1 rounded-[2.5rem]">
         <LogSection 
