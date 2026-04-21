@@ -6,6 +6,7 @@ function StatChange() {
 
   // Local states for inputs
   const [peeAmount, setPeeAmount] = useState("")
+  const [peeNote, setPeeNote] = useState("")
   const [waterAmount, setWaterAmount] = useState("")
   const [foodItem, setFoodItem] = useState("")
 
@@ -21,8 +22,15 @@ function StatChange() {
     e.preventDefault()
     const val = parseFloat(peeAmount)
     if (isNaN(val) || val <= 0) return
-    await addPeeStat({ pee_amount: val })
+    
+    // Pass both amount and notes to context
+    await addPeeStat({ 
+      pee_amount: val, 
+      pee_notes: peeNote 
+    })
+    
     setPeeAmount("")
+    setPeeNote("") // Reset note field
     triggerSuccess('pee')
   }
 
@@ -51,7 +59,7 @@ function StatChange() {
           Entry No. {new Date().toLocaleDateString()}
         </span>
         <h2 className="text-5xl font-serif font-light text-base-content leading-tight">
-          Body <span className="italic font-normal">Intelligence.</span>
+          Body <span className="italic font-normal text-primary">Intelligence.</span>
         </h2>
       </div>
 
@@ -77,15 +85,27 @@ function StatChange() {
               )}
             </button>
           </div>
+          
           <input
             type="number"
             inputMode="decimal"
             placeholder="0"
-            className="w-full bg-transparent text-5xl font-serif outline-none placeholder:text-base-content/5"
+            className="w-full bg-transparent text-5xl font-serif outline-none placeholder:text-base-content/5 mb-4"
             value={peeAmount}
             onChange={(e) => setPeeAmount(e.target.value)}
           />
-          <p className="mt-2 text-[10px] font-black opacity-40 uppercase tracking-widest">Pee (oz)</p>
+          
+          <p className="my-4 text-[10px] font-black opacity-40 uppercase tracking-widest">Pee (oz)</p>
+
+          {/* Textarea for Notes */}
+          <textarea 
+            placeholder="Experience notes..."
+            className="w-full bg-base-content/5 border-none rounded-2xl p-4 text-xs font-medium outline-none placeholder:opacity-20 resize-none h-20 transition-all focus:bg-base-content/10"
+            value={peeNote}
+            onChange={(e) => setPeeNote(e.target.value)}
+          />
+
+          
         </form>
 
         {/* WATER CARD */}
@@ -112,11 +132,11 @@ function StatChange() {
             type="number"
             inputMode="decimal"
             placeholder="0"
-            className="w-full bg-transparent text-5xl font-serif outline-none placeholder:text-base-content/5"
+            className="w-full bg-transparent text-5xl font-serif outline-none placeholder:text-base-content/5 h-20"
             value={waterAmount}
             onChange={(e) => setWaterAmount(e.target.value)}
           />
-          <p className="mt-2 text-[10px] font-black opacity-40 uppercase tracking-widest">Water (oz)</p>
+          <p className="mt-20 text-[10px] font-black opacity-40 uppercase tracking-widest">Water (oz)</p>
         </form>
 
         {/* FOOD CARD */}
@@ -142,11 +162,11 @@ function StatChange() {
           <input
             type="text"
             placeholder="Entry..."
-            className="w-full bg-transparent text-3xl font-serif outline-none placeholder:text-base-content/5"
+            className="w-full bg-transparent text-3xl font-serif outline-none placeholder:text-base-content/5 h-20"
             value={foodItem}
             onChange={(e) => setFoodItem(e.target.value)}
           />
-          <p className="mt-2 text-[10px] font-black opacity-40 uppercase tracking-widest">Food Journal</p>
+          <p className="mt-20 text-[10px] font-black opacity-40 uppercase tracking-widest">Food Journal</p>
         </form>
 
       </div>

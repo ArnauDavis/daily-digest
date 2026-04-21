@@ -11,6 +11,9 @@ const formatForInput = (timestamp) => {
 
 // Memoized Individual Row
 const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) => {
+  // NEW: State to track if this specific row's note is expanded
+  const [isExpanded, setIsExpanded] = useState(false)
+
   const dateObj = new Date(item.created_at)
   const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   const dateStr = dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' })
@@ -32,9 +35,22 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
         </div>
       </td>
       <td className="text-center">
-        <span className={`font-serif ${isString ? 'text-xs italic' : 'text-lg'} font-medium ${displayColor}`}>
-          {value} <span className="text-[10px] opacity-30 ml-1">{unit}</span>
-        </span>
+        <div className="flex flex-col items-center">
+          <span className={`font-serif ${isString ? 'text-xs italic' : 'text-lg'} font-medium ${displayColor}`}>
+            {value} <span className="text-[10px] opacity-30 ml-1">{unit}</span>
+          </span>
+          
+          {item.pee_notes && (
+            <span 
+              onClick={() => setIsExpanded(!isExpanded)}
+              className={`text-[10px] opacity-50 italic mt-1 px-4 cursor-pointer transition-all duration-300
+                ${isExpanded ? 'max-w-xs whitespace-normal wrap-break-word' : 'max-w-35 truncate block'}
+              `}
+            >
+              "{item.pee_notes}"
+            </span>
+          )}
+        </div>
       </td>
       <td className="pr-8 text-right space-x-2">
         {onEdit && (
@@ -151,43 +167,47 @@ function StatsHistory() {
   const [activeType, setActiveType] = useState("") 
   const [tempValue, setTempValue] = useState("")
   const [tempDate, setTempDate] = useState("")
+  const [tempNotes, setTempNotes] = useState("")
 
-  // --- HYDRATION BALANCE CALCULATION ---
   const netFluidData = useMemo(() => {
-    const totals = {};
-
+    const totals = {}
     waterStat.forEach(entry => {
-      const date = new Date(entry.created_at).toLocaleDateString();
-      totals[date] = (totals[date] || 0) + parseFloat(entry.water_amount || 0);
-    });
-
+      const date = new Date(entry.created_at).toLocaleDateString()
+      totals[date] = (totals[date] || 0) + parseFloat(entry.water_amount || 0)
+    })
     peeStat.forEach(entry => {
-      const date = new Date(entry.created_at).toLocaleDateString();
-      totals[date] = (totals[date] || 0) - parseFloat(entry.pee_amount || 0);
-    });
-
+      const date = new Date(entry.created_at).toLocaleDateString()
+      totals[date] = (totals[date] || 0) - parseFloat(entry.pee_amount || 0)
+    })
     return Object.entries(totals)
       .map(([date, net]) => ({
         id: `net-${date}`, 
         created_at: date, 
         net_amount: net > 0 ? `+${net.toFixed(1)}` : net.toFixed(1)
       }))
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  }, [peeStat, waterStat]);
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+  }, [peeStat, waterStat])
 
   const handleEditOpen = (item, type) => {
     setActiveType(type)
     setEditingItem(item)
     setTempDate(formatForInput(item.created_at))
     setTempValue(type === "pee" ? item.pee_amount : type === "water" ? item.water_amount : item.food_amount)
+    setTempNotes(item.pee_notes || "")
     document.getElementById('edit_modal').showModal()
   }
 
   const handleSave = async () => {
     const isoDate = new Date(tempDate).toISOString()
-    if (activeType === "pee") await updatePeeStat(editingItem.id, tempValue, isoDate)
-    else if (activeType === "water") await updateWaterStat(editingItem.id, tempValue, isoDate)
-    else if (activeType === "food") await updateFoodStat(editingItem.id, tempValue, isoDate)
+    if (activeType === "pee") {
+      await updatePeeStat(editingItem.id, tempValue, isoDate, tempNotes)
+    } 
+    else if (activeType === "water") {
+      await updateWaterStat(editingItem.id, tempValue, isoDate)
+    } 
+    else if (activeType === "food") {
+      await updateFoodStat(editingItem.id, tempValue, isoDate)
+    }
     document.getElementById('edit_modal').close()
   }
 
@@ -215,7 +235,6 @@ function StatsHistory() {
         </h2>
       </div>
 
-      {/* Net Balance (Calculated) */}
       <LogSection 
         title="Hydration Balance" 
         subtitle="Daily Net Differential (In vs Out)" 
@@ -248,33 +267,61 @@ function StatsHistory() {
         onDelete={(id) => handleDeleteOpen(id, "food")}
       />
 
-      {/* Edit Modal */}
       <dialog id="edit_modal" className="modal backdrop-blur-md">
-        <div className="modal-box bg-base-100 border border-base-content/10 p-10 rounded-[2.5rem] shadow-2xl max-w-md">
+        <div className="modal-box bg-base-100 border border-base-content/10 p-10 rounded-[2.5rem] shadow-2xl max-w-md w-full">
           <div className="text-center mb-8">
             <h3 className="font-serif text-2xl font-semibold italic">Refine Entry</h3>
             <p className="text-[10px] uppercase tracking-widest opacity-40 font-bold">Editing {activeType}</p>
           </div>
-          <div className="space-y-6">
-            <div className="form-control">
+
+          <div className="space-y-6 w-full">
+            <div className="form-control w-full">
               <label className="text-[10px] uppercase font-black opacity-30 mb-2 ml-2">Time</label>
-              <input type="datetime-local" className="input bg-base-200/50 border-none rounded-2xl h-14" 
-                value={tempDate} onChange={(e) => setTempDate(e.target.value)} />
+              <input 
+                type="datetime-local" 
+                className="input w-full bg-base-200/50 border-none rounded-2xl h-14 px-4 focus:outline-none" 
+                value={tempDate} 
+                onChange={(e) => setTempDate(e.target.value)} 
+              />
             </div>
-            <div className="form-control">
+
+            <div className="form-control w-full">
               <label className="text-[10px] uppercase font-black opacity-30 mb-2 ml-2">Record</label>
-              <input type={activeType === "food" ? "text" : "number"} className="input bg-base-200/50 border-none rounded-2xl h-14" 
-                value={tempValue} onChange={(e) => setTempValue(e.target.value)} />
+              <input 
+                type={activeType === "food" ? "text" : "number"} 
+                className="input w-full bg-base-200/50 border-none rounded-2xl h-14 px-4 focus:outline-none" 
+                value={tempValue} 
+                onChange={(e) => setTempValue(e.target.value)} 
+              />
             </div>
+
+            {activeType === "pee" && (
+              <div className="form-control w-full">
+                <label className="text-[10px] uppercase font-black opacity-30 mb-2 ml-2">Experience Notes</label>
+                <textarea 
+                  className="textarea w-full bg-base-200/50 border-none rounded-2xl min-h-25 leading-relaxed pt-4 px-4 focus:outline-none resize-none"
+                  placeholder="How was the experience? (Color, clarity, etc.)"
+                  value={tempNotes}
+                  onChange={(e) => setTempNotes(e.target.value)}
+                />
+              </div>
+            )}
           </div>
+          
           <div className="modal-action mt-10 grid grid-cols-2 gap-4">
-            <form method="dialog"><button className="btn btn-ghost w-full rounded-2xl uppercase text-[10px] font-black">Discard</button></form>
-            <button className="btn btn-primary w-full rounded-2xl uppercase text-[10px] font-black" onClick={handleSave}>Commit</button>
+            <form method="dialog" className="w-full">
+              <button className="btn btn-ghost w-full rounded-2xl uppercase text-[10px] font-black">Discard</button>
+            </form>
+            <button 
+              className="btn btn-primary w-full rounded-2xl uppercase text-[10px] font-black" 
+              onClick={handleSave}
+            >
+              Commit
+            </button>
           </div>
         </div>
       </dialog>
 
-      {/* Delete Confirmation Modal */}
       <dialog id="delete_confirm_modal" className="modal backdrop-blur-md">
         <div className="modal-box border border-error/10 bg-base-100 p-10 rounded-[2.5rem] shadow-2xl max-sm text-center">
           <h3 className="font-serif text-2xl font-semibold mb-2">Erase Record?</h3>

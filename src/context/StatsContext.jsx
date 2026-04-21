@@ -112,16 +112,24 @@ export function StatsProvider({ children, session }) {
 
     // --- UPDATERS ---
 
-    const updatePeeStat = useCallback(async (statId, newPee, newDate) => {
+    const updatePeeStat = useCallback(async (statId, newPee, newDate, newNotes) => {
         if (!userId) return
         const { data, error } = await supabase
             .from('pee')
-            .update({ pee_amount: newPee, created_at: newDate })
+            .update({ 
+              pee_amount: newPee, 
+              created_at: newDate,
+              pee_notes: newNotes 
+            })
             .eq('id', statId)
             .eq('user_id', userId)
             .select()
-        if (error) console.error('Update failed:', error)
-        else setPeeStat(prev => prev.map(s => (s.id === statId ? { ...s, ...data[0] } : s)))
+
+        if (error) {
+          console.error('Update failed:', error)
+        } else {
+          setPeeStat(prev => prev.map(s => (s.id === statId ? { ...s, ...data[0] } : s)))
+        }
     }, [userId])
 
     const updateWaterStat = useCallback(async (statId, newWater, newDate) => {
