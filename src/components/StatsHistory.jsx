@@ -11,7 +11,7 @@ const formatForInput = (timestamp) => {
 
 // Memoized Individual Row
 const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) => {
-  // NEW: State to track if this specific row's note is expanded
+  // State to track if this specific row's note is expanded
   const [isExpanded, setIsExpanded] = useState(false)
 
   const dateObj = new Date(item.created_at)
@@ -34,12 +34,21 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
           <span className="text-[8px] opacity-30 uppercase font-black">{dateStr}</span>
         </div>
       </td>
-      <td className="text-center">
+      <td className="text-center py-4">
         <div className="flex flex-col items-center">
-          <span className={`font-serif ${isString ? 'text-xs italic' : 'text-lg'} font-medium ${displayColor}`}>
+          {/* Main Value / Food Entry */}
+          <span 
+            onClick={() => isString && setIsExpanded(!isExpanded)}
+            className={`font-serif font-medium transition-all duration-300 ${displayColor} ${
+              isString 
+                ? `text-xs italic cursor-pointer px-4 ${isExpanded ? 'max-w-xs whitespace-normal wrap-break-word' : 'max-w-35 truncate block'}` 
+                : 'text-lg'
+            }`}
+          >
             {value} <span className="text-[10px] opacity-30 ml-1">{unit}</span>
           </span>
           
+          {/* Pee Notes (Click to Expand) */}
           {item.pee_notes && (
             <span 
               onClick={() => setIsExpanded(!isExpanded)}
@@ -52,16 +61,18 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
           )}
         </div>
       </td>
-      <td className="pr-8 text-right space-x-2">
-        {onEdit && (
-          <button onClick={() => onEdit(item)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100">✎</button>
-        )}
-        {onDelete && (
-          <button onClick={() => onDelete(item.id)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 hover:text-error">✕</button>
-        )}
-        {isNetRow && (
-          <span className="text-[10px] opacity-20 font-black uppercase tracking-tighter italic">Net Balance</span>
-        )}
+      <td className="pr-8">
+        <div className="flex flex-col md:flex-row items-center justify-end gap-2 md:gap-4">
+          {onEdit && (
+            <button onClick={() => onEdit(item)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 flex items-center justify-center">✎</button>
+          )}
+          {onDelete && (
+            <button onClick={() => onDelete(item.id)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 hover:text-error flex items-center justify-center">✕</button>
+          )}
+          {isNetRow && (
+            <span className="text-[10px] opacity-20 font-black uppercase tracking-tighter italic">Net Balance</span>
+          )}
+        </div>
       </td>
     </tr>
   )
