@@ -48,15 +48,15 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
             {value} <span className="text-[10px] opacity-30 ml-1">{unit}</span>
           </span>
           
-          {/* Pee Notes (Click to Expand) */}
-          {item.pee_notes && (
+          {/* Notes (Click to Expand) */}
+          {(item.pee_notes || item.water_notes) && (
             <span 
               onClick={() => setIsExpanded(!isExpanded)}
               className={`text-[10px] opacity-50 italic mt-1 px-4 cursor-pointer transition-all duration-300
                 ${isExpanded ? 'max-w-xs whitespace-normal wrap-break-word' : 'max-w-35 truncate block'}
               `}
             >
-              "{item.pee_notes}"
+              "{item.pee_notes || item.water_notes}"
             </span>
           )}
         </div>
@@ -204,7 +204,7 @@ function StatsHistory() {
     setEditingItem(item)
     setTempDate(formatForInput(item.created_at))
     setTempValue(type === "pee" ? item.pee_amount : type === "water" ? item.water_amount : item.food_amount)
-    setTempNotes(item.pee_notes || "")
+    setTempNotes(item.pee_notes || item.water_notes || "")
     document.getElementById('edit_modal').showModal()
   }
 
@@ -214,7 +214,7 @@ function StatsHistory() {
       await updatePeeStat(editingItem.id, tempValue, isoDate, tempNotes)
     } 
     else if (activeType === "water") {
-      await updateWaterStat(editingItem.id, tempValue, isoDate)
+      await updateWaterStat(editingItem.id, tempValue, isoDate, tempNotes)
     } 
     else if (activeType === "food") {
       await updateFoodStat(editingItem.id, tempValue, isoDate)
@@ -251,7 +251,7 @@ function StatsHistory() {
         subtitle="Daily Net Differential (In vs Out)" 
         data={netFluidData} 
         valKey="net_amount" 
-        unit="oz" 
+        unit="cc" 
         color="text-primary font-bold italic" 
         onEdit={null} 
         onDelete={null} 
@@ -259,14 +259,14 @@ function StatsHistory() {
 
       <LogSection 
         title="Pee Logs" subtitle="Output Tracking" data={peeStat} valKey="pee_amount" 
-        unit="oz" color="text-yellow-500" 
+        unit="cc" color="text-yellow-500" 
         onEdit={(item) => handleEditOpen(item, "pee")}
         onDelete={(id) => handleDeleteOpen(id, "pee")}
       />
 
       <LogSection 
         title="Water Intake" subtitle="Hydration Log" data={waterStat} valKey="water_amount" 
-        unit="oz" color="text-blue-500" 
+        unit="cc" color="text-blue-500" 
         onEdit={(item) => handleEditOpen(item, "water")}
         onDelete={(id) => handleDeleteOpen(id, "water")}
       />
@@ -306,12 +306,14 @@ function StatsHistory() {
               />
             </div>
 
-            {activeType === "pee" && (
+            {(activeType === "pee" || activeType === "water") && (
               <div className="form-control w-full">
-                <label className="text-[10px] uppercase font-black opacity-30 mb-2 ml-2">Experience Notes</label>
+                <label className="text-[10px] uppercase font-black opacity-30 mb-2 ml-2">
+                  {activeType === "pee" ? "Experience Notes" : "Intake Notes"}
+                </label>
                 <textarea 
                   className="textarea w-full bg-base-200/50 border-none rounded-2xl min-h-25 leading-relaxed pt-4 px-4 focus:outline-none resize-none"
-                  placeholder="How was the experience? (Color, clarity, etc.)"
+                  placeholder={activeType === "pee" ? "Color, clarity, etc." : "What did you drink?"}
                   value={tempNotes}
                   onChange={(e) => setTempNotes(e.target.value)}
                 />

@@ -58,14 +58,14 @@ function DailyStats() {
         <div className="grid grid-cols-3 gap-4 mt-10">
           <div className="text-center">
             <p className="text-[9px] uppercase font-black opacity-30 tracking-widest mb-1">Total In</p>
-            <p className="font-serif text-2xl text-blue-500">{dailyWater}<span className="text-xs ml-1">oz</span></p>
+            <p className="font-serif text-2xl text-blue-500">{dailyWater}<span className="text-xs ml-1">cc</span></p>
           </div>
 
           <div className="text-center border-x border-base-content/5">
             <p className="text-[9px] uppercase font-black opacity-30 tracking-widest mb-1">Net Retained</p>
             <p className={`font-serif text-2xl ${netFluid >= 0 ? 'text-success' : 'text-error'}`}>
               {netFluid > 0 ? `+${netFluid}` : netFluid}
-              <span className="text-xs ml-1">oz</span>
+              <span className="text-xs ml-1">cc</span>
             </p>
           </div>
 

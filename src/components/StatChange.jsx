@@ -8,6 +8,7 @@ function StatChange() {
   const [peeAmount, setPeeAmount] = useState("")
   const [peeNote, setPeeNote] = useState("")
   const [waterAmount, setWaterAmount] = useState("")
+  const [waterNote, setWaterNote] = useState("")
   const [foodItem, setFoodItem] = useState("")
 
   // Success states for visual feedback
@@ -38,8 +39,12 @@ function StatChange() {
     e.preventDefault()
     const val = parseFloat(waterAmount)
     if (isNaN(val) || val <= 0) return
-    await addWaterStat({ water_amount: val })
+    await addWaterStat({ 
+      water_amount: val,
+      water_notes: waterNote
+     })
     setWaterAmount("")
+    setWaterNote("")
     triggerSuccess('water')
   }
 
@@ -95,7 +100,7 @@ function StatChange() {
             onChange={(e) => setPeeAmount(e.target.value)}
           />
           
-          <p className="my-4 text-[10px] font-black opacity-40 uppercase tracking-widest">Pee (oz)</p>
+          <p className="my-4 text-[10px] font-black opacity-40 uppercase tracking-widest">Pee (cc)</p>
 
           {/* Textarea for Notes */}
           <textarea 
@@ -128,15 +133,25 @@ function StatChange() {
               )}
             </button>
           </div>
+            
           <input
             type="number"
             inputMode="decimal"
             placeholder="0"
-            className="w-full bg-transparent text-5xl font-serif outline-none placeholder:text-base-content/5 h-20"
+            className="w-full bg-transparent text-5xl font-serif outline-none placeholder:text-base-content/5 mb-4" 
             value={waterAmount}
             onChange={(e) => setWaterAmount(e.target.value)}
           />
-          <p className="mt-20 text-[10px] font-black opacity-40 uppercase tracking-widest">Water (oz)</p>
+
+          <p className="my-4 text-[10px] font-black opacity-40 uppercase tracking-widest">Fluid (cc)</p>
+            
+          {/* Textarea for Notes */}
+          <textarea 
+            placeholder="What did you drink?"
+            className="w-full bg-base-content/5 border-none rounded-2xl p-4 text-xs font-medium outline-none placeholder:opacity-20 resize-none h-20 transition-all focus:bg-base-content/10"
+            value={waterNote}
+            onChange={(e) => setWaterNote(e.target.value)}
+          />
         </form>
 
         {/* FOOD CARD */}

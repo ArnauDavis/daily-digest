@@ -132,11 +132,11 @@ export function StatsProvider({ children, session }) {
         }
     }, [userId])
 
-    const updateWaterStat = useCallback(async (statId, newWater, newDate) => {
+    const updateWaterStat = useCallback(async (statId, newWater, newDate, newNotes) => {
         if (!userId) return
         const { data, error } = await supabase
             .from('water')
-            .update({ water_amount: newWater, created_at: newDate })
+            .update({ water_amount: newWater, created_at: newDate, water_notes: newNotes })
             .eq('id', statId)
             .eq('user_id', userId)
             .select()
