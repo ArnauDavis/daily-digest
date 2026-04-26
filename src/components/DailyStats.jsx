@@ -71,7 +71,7 @@ function DailyStats() {
 
           <div className="text-center">
             <p className="text-[9px] uppercase font-black opacity-30 tracking-widest mb-1">Total Out</p>
-            <p className="font-serif text-2xl text-yellow-600">{dailyPee}<span className="text-xs ml-1">oz</span></p>
+            <p className="font-serif text-2xl text-yellow-600">{dailyPee}<span className="text-xs ml-1">cc</span></p>
           </div>
         </div>
 
