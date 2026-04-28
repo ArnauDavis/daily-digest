@@ -30,6 +30,7 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
     <tr className="hover:bg-base-200/30 border-b border-base-content/5 last:border-none transition-all">
       <td className="py-4 pl-8">
         <div className="flex flex-col">
+          {/* Restored original logic: show 'Daily' for net rows, otherwise time */}
           <span className="font-mono text-xs font-bold">{isNetRow ? 'Daily' : timeStr}</span>
           <span className="text-[8px] opacity-30 uppercase font-black">{dateStr}</span>
         </div>
@@ -62,15 +63,33 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
         </div>
       </td>
       <td className="pr-8">
-        <div className="flex flex-col md:flex-row items-center justify-end gap-2 md:gap-4">
-          {onEdit && (
-            <button onClick={() => onEdit(item)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 flex items-center justify-center">✎</button>
+        <div className="flex flex-col items-end justify-center gap-2">
+
+          {/* Container for Edit/Delete Buttons */}
+          {(onEdit || onDelete) && (
+            <div className="flex items-center gap-4">
+              {onEdit && (
+                <button onClick={() => onEdit(item)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 flex items-center justify-center">✎</button>
+              )}
+              {onDelete && (
+                <button onClick={() => onDelete(item.id)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 hover:text-error flex items-center justify-center">✕</button>
+              )}
+            </div>
           )}
-          {onDelete && (
-            <button onClick={() => onDelete(item.id)} className="btn btn-ghost btn-circle btn-xs opacity-40 hover:opacity-100 hover:text-error flex items-center justify-center">✕</button>
-          )}
-          {isNetRow && (
-            <span className="text-[10px] opacity-20 font-black uppercase tracking-tighter italic">Net Balance</span>
+
+          {/* Container for Horizontal In/Out Numbers */}
+          {isNetRow && item.waterTotal !== undefined && (
+            <div className="flex items-center gap-3 opacity-40 whitespace-nowrap border-t border-base-content/5 pt-1 mt-1 md:border-none md:pt-0 md:mt-0">
+               <span className="text-[10px] font-black text-blue-500 tracking-tighter">
+                 {item.waterTotal}
+               </span>
+
+               <div className="w-[1px] h-3 bg-base-content/20" />
+
+               <span className="text-[10px] font-black text-yellow-600 tracking-tighter">
+                 {item.peeTotal}
+               </span>
+            </div>
           )}
         </div>
       </td>
@@ -180,24 +199,31 @@ function StatsHistory() {
   const [tempDate, setTempDate] = useState("")
   const [tempNotes, setTempNotes] = useState("")
 
-  const netFluidData = useMemo(() => {
-    const totals = {}
-    waterStat.forEach(entry => {
-      const date = new Date(entry.created_at).toLocaleDateString()
-      totals[date] = (totals[date] || 0) + parseFloat(entry.water_amount || 0)
-    })
-    peeStat.forEach(entry => {
-      const date = new Date(entry.created_at).toLocaleDateString()
-      totals[date] = (totals[date] || 0) - parseFloat(entry.pee_amount || 0)
-    })
-    return Object.entries(totals)
-      .map(([date, net]) => ({
+const netFluidData = useMemo(() => {
+  const totals = {}
+  waterStat.forEach(entry => {
+    const date = new Date(entry.created_at).toLocaleDateString()
+    if (!totals[date]) totals[date] = { in: 0, out: 0 }
+    totals[date].in += parseFloat(entry.water_amount || 0)
+  })
+  peeStat.forEach(entry => {
+    const date = new Date(entry.created_at).toLocaleDateString()
+    if (!totals[date]) totals[date] = { in: 0, out: 0 }
+    totals[date].out += parseFloat(entry.pee_amount || 0)
+  })
+  return Object.entries(totals)
+    .map(([date, stats]) => {
+      const net = stats.in - stats.out
+      return {
         id: `net-${date}`, 
         created_at: date, 
-        net_amount: net > 0 ? `+${net.toFixed(1)}` : net.toFixed(1)
-      }))
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-  }, [peeStat, waterStat])
+        net_amount: net > 0 ? `+${net.toFixed(1)}` : net.toFixed(1),
+        waterTotal: stats.in.toFixed(0),
+        peeTotal: stats.out.toFixed(0)
+      }
+    })
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+}, [peeStat, waterStat])
 
   const handleEditOpen = (item, type) => {
     setActiveType(type)
