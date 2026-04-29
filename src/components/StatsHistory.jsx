@@ -301,7 +301,7 @@ const netFluidData = useMemo(() => {
       />
 
       <LogSection 
-        title="Water Intake" subtitle="Hydration Log" data={waterStat} valKey="water_amount" 
+        title="Fluid Intake" subtitle="Hydration Log" data={waterStat} valKey="water_amount" 
         unit="cc" color="text-blue-500" 
         onEdit={(item) => handleEditOpen(item, "water")}
         onDelete={(id) => handleDeleteOpen(id, "water")}
