@@ -30,7 +30,6 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
     <tr className="hover:bg-base-200/30 border-b border-base-content/5 last:border-none transition-all">
       <td className="py-4 pl-8">
         <div className="flex flex-col">
-          {/* Restored original logic: show 'Daily' for net rows, otherwise time */}
           <span className="font-mono text-xs font-bold">{isNetRow ? 'Daily' : timeStr}</span>
           <span className="text-[8px] opacity-30 uppercase font-black">{dateStr}</span>
         </div>
@@ -84,7 +83,7 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
                  {item.waterTotal}
                </span>
 
-               <div className="w-[1px] h-3 bg-base-content/20" />
+               <div className="w-px h-3 bg-base-content/20" />
 
                <span className="text-[10px] font-black text-yellow-600 tracking-tighter">
                  {item.peeTotal}
@@ -144,7 +143,7 @@ function LogSection({ title, subtitle, data, valKey, unit, color, onEdit, onDele
                     {headers?.action === "In | Out" ? (
                       <div className="flex items-center justify-end gap-2">
                         <span>In</span>
-                        <div className="w-[1px] h-2 bg-base-content/30" />
+                        <div className="w-px h-2 bg-base-content/30" />
                         <span>Out</span>
                       </div>
                     ) : (
