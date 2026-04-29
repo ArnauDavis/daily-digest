@@ -97,7 +97,7 @@ const LogRow = memo(({ item, valKey, unit, color, isString, onEdit, onDelete }) 
   )
 })
 
-function LogSection({ title, subtitle, data, valKey, unit, color, onEdit, onDelete, isString }) {
+function LogSection({ title, subtitle, data, valKey, unit, color, onEdit, onDelete, isString, headers }) {
   const [isOpen, setIsOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
@@ -139,8 +139,18 @@ function LogSection({ title, subtitle, data, valKey, unit, color, onEdit, onDele
               <thead>
                 <tr className="bg-base-200/30 text-[9px] uppercase tracking-widest opacity-40">
                   <th className="py-4 pl-8">Date</th>
-                  <th className="text-center">Record</th>
-                  <th className="pr-8 text-right">Action</th>
+                  <th className="text-center">{headers?.val || "Record"}</th>
+                  <th className="pr-8 text-right">
+                    {headers?.action === "In | Out" ? (
+                      <div className="flex items-center justify-end gap-2">
+                        <span>In</span>
+                        <div className="w-[1px] h-2 bg-base-content/30" />
+                        <span>Out</span>
+                      </div>
+                    ) : (
+                      headers?.action || "Action"
+                    )}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -281,6 +291,7 @@ const netFluidData = useMemo(() => {
         color="text-primary font-bold italic" 
         onEdit={null} 
         onDelete={null} 
+        headers={{ val: "Balance", action: "In | Out" }}
       />
 
       <LogSection 
