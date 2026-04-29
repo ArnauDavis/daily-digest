@@ -100,7 +100,7 @@ function StatChange() {
             onChange={(e) => setPeeAmount(e.target.value)}
           />
           
-          <p className="my-4 text-[10px] font-black opacity-40 uppercase tracking-widest">Pee (cc)</p>
+          <p className="my-4 text-[10px] font-black opacity-40 uppercase tracking-widest">Urine (cc)</p>
 
           {/* Textarea for Notes */}
           <textarea 

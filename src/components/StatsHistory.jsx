@@ -294,7 +294,7 @@ const netFluidData = useMemo(() => {
       />
 
       <LogSection 
-        title="Pee Logs" subtitle="Output Tracking" data={peeStat} valKey="pee_amount" 
+        title="Urine Logs" subtitle="Output Tracking" data={peeStat} valKey="pee_amount" 
         unit="cc" color="text-yellow-500" 
         onEdit={(item) => handleEditOpen(item, "pee")}
         onDelete={(id) => handleDeleteOpen(id, "pee")}

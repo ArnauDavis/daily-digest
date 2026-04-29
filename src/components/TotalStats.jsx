@@ -85,8 +85,8 @@ function TotalStats() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <MilestoneStat label="Water Total" value={lifetimeWater} unit="oz" color="text-blue-500" />
-          <MilestoneStat label="Pee Total" value={lifetimePee} unit="oz" color="text-yellow-500" centerpiece={true} />
-          <MilestoneStat label="Records" value={combinedEntryCount} unit="#" color="text-accent" subtitle="Pee + Water" />
+          <MilestoneStat label="Urine Total" value={lifetimePee} unit="oz" color="text-yellow-500" centerpiece={true} />
+          <MilestoneStat label="Records" value={combinedEntryCount} unit="#" color="text-accent" subtitle="Urine + Fluids" />
         </div>
       </div>
     </>
