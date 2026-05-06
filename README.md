@@ -64,7 +64,7 @@ The most significant breakthrough was learning when and why to use the useMemo h
 
 * The Solution: I implemented useMemo to "memoize" (cache) the results of these expensive calculations.
 
-* When to Use It: I learned that useMemo should be used when you have a complex calculation that relies on specific data (like an array of stats). By using it, React only re-runs that logic when the actual data changes—not every time the component re-renders. This keeps the UI feeling snappy and professional even as data grows.
+* When to Use It: I learned that useMemo should be used when you have a complex calculation that relies on specific data (like an array of stats). By using it, React only re-runs that logic when the actual data changes not every time the component re-renders. This keeps the UI feeling snappy and professional even as data grows.
 
 **Global State Orchestration via Context API**
 
@@ -72,7 +72,7 @@ In previous projects, data was passed linearly. For Daily Digest, I needed a "Si
 
 * Implementing StatsProvider: I developed a custom StatsProvider using the React Context API. This allowed me to wrap the entire application in a data "bubble" where hydration stats, food logs, and CRUD functions are globally available.
 
-* Eliminating Prop Drilling: This architecture prevented "prop drilling"—the tedious process of passing data through components that don't need it. Whether a user adds a log in a small popup or views a summary in the header, every component stays perfectly in sync because they are all consuming from the same Context.
+* Eliminating Prop Drilling: This architecture prevented "prop drilling", which is the tedious process of passing data through components that don't need it. Whether a user adds a log in a small popup or views a summary in the header, every component stays perfectly in sync because they are all consuming from the same Context.
 
 * Stateful Logic: I learned how to encapsulate complex asynchronous logic (like database fetching and error handling) directly within the Provider, keeping the UI components clean and focused strictly on rendering.
 
