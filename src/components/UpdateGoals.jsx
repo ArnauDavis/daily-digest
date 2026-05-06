@@ -8,17 +8,19 @@ function UpdateGoals() {
   const handleSubmit = (e) => {
     e.preventDefault()
     const formData = new FormData(e.target)
+    
     updateGoals({
-      daily_goal_water: Number(formData.get('daily_water')),
-      daily_goal_pee: Number(formData.get('daily_pee')),
-      weekly_goal_water: Number(formData.get('weekly_water')),
-      weekly_goal_pee: Number(formData.get('weekly_pee'))
+      daily_goal_water: Number(formData.get('daily_goal_water')),
+      daily_goal_pee: Number(formData.get('daily_goal_pee')),
+      weekly_goal_water: Number(formData.get('weekly_goal_water')),
+      weekly_goal_pee: Number(formData.get('weekly_goal_pee'))
     })
+    
     if (checkboxRef.current) checkboxRef.current.checked = false
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-6 my-16">
+    <div className="w-full">
       <div className="collapse bg-base-100 border border-base-content/10 rounded-[2.5rem] shadow-sm overflow-hidden">
         <input id="target-settings-check" type="checkbox" ref={checkboxRef} className="peer" /> 
         
@@ -32,7 +34,7 @@ function UpdateGoals() {
             </div>
             <div>
               <h3 className="text-xl font-serif font-semibold">Focus & Objectives</h3>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-base-content/40 font-bold">Calibration</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-base-content/40 font-bold text-nowrap">Volume Calibration</p>
             </div>
           </div>
           <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/5 px-4 py-2 rounded-full hidden sm:block">Settings</span>
@@ -41,11 +43,42 @@ function UpdateGoals() {
         <div className="collapse-content bg-base-200/20 px-8">
           <form className="py-10 space-y-12" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-              <GoalGroup title="The Daily Path" waterKey="daily_water" peeKey="daily_pee" waterVal={goals?.daily_goal_water} peeVal={goals?.daily_goal_pee} color="primary" />
-              <GoalGroup title="The Weekly Horizon" waterKey="weekly_water" peeKey="weekly_pee" waterVal={goals?.weekly_goal_water} peeVal={goals?.weekly_goal_pee} color="secondary" />
+              
+              <GoalGroup title="The Daily Path" color="primary">
+                <GoalInput 
+                  name="daily_goal_water" 
+                  label="Intake Target" 
+                  defaultValue={goals?.daily_goal_water} 
+                  colorClass="focus:text-primary" 
+                />
+                <GoalInput 
+                  name="daily_goal_pee" 
+                  label="Output Target" 
+                  defaultValue={goals?.daily_goal_pee} 
+                  colorClass="focus:text-primary" 
+                />
+              </GoalGroup>
+
+              <GoalGroup title="The Weekly Horizon" color="secondary">
+                <GoalInput 
+                  name="weekly_goal_water" 
+                  label="Intake Target" 
+                  defaultValue={goals?.weekly_goal_water} 
+                  colorClass="focus:text-secondary" 
+                />
+                <GoalInput 
+                  name="weekly_goal_pee" 
+                  label="Output Target" 
+                  defaultValue={goals?.weekly_goal_pee} 
+                  colorClass="focus:text-secondary" 
+                />
+              </GoalGroup>
+
             </div>
             <div className="flex justify-center pt-8">
-              <button type="submit" className="btn btn-primary rounded-full px-16 h-16 shadow-xl text-lg font-bold">Commit Changes</button>
+              <button type="submit" className="btn btn-primary rounded-full px-16 h-16 shadow-xl text-lg font-bold uppercase tracking-widest">
+                Commit Changes
+              </button>
             </div>
           </form>
         </div>
@@ -54,8 +87,7 @@ function UpdateGoals() {
   )
 }
 
-function GoalGroup({ title, waterKey, peeKey, waterVal, peeVal, color }) {
-  const colorClass = color === 'primary' ? 'focus:text-primary' : 'focus:text-secondary'
+function GoalGroup({ title, color, children }) {
   const borderClass = color === 'primary' ? 'bg-primary' : 'bg-secondary'
   
   return (
@@ -65,8 +97,7 @@ function GoalGroup({ title, waterKey, peeKey, waterVal, peeVal, color }) {
          <h4 className="text-xs uppercase font-black tracking-widest text-base-content/60">{title}</h4>
       </div>
       <div className="space-y-4">
-        <GoalInput name={waterKey} label="Hydration Target" defaultValue={waterVal} colorClass={colorClass} />
-        <GoalInput name={peeKey} label="Output Target" defaultValue={peeVal} colorClass={colorClass} />
+        {children}
       </div>
     </div>
   )
@@ -74,11 +105,16 @@ function GoalGroup({ title, waterKey, peeKey, waterVal, peeVal, color }) {
 
 function GoalInput({ name, label, defaultValue, colorClass }) {
   return (
-    <div className="flex justify-between items-end border-b border-base-content/10 pb-2">
+    <div className="flex justify-between items-end border-b border-base-content/10 pb-2 focus-within:border-current transition-colors">
       <label className="text-sm font-medium opacity-50 italic">{label}</label>
       <div className="flex items-center gap-2">
-        <input name={name} type="number" defaultValue={defaultValue} className={`bg-transparent text-2xl font-serif w-24 text-right outline-none transition-colors ${colorClass}`} />
-        <span className="text-[10px] uppercase opacity-20 font-bold">oz</span>
+        <input 
+          name={name} 
+          type="number" 
+          defaultValue={defaultValue} 
+          className={`bg-transparent text-2xl font-serif w-24 text-right outline-none transition-colors ${colorClass}`} 
+        />
+        <span className="text-[10px] uppercase opacity-30 font-bold w-5">cc</span>
       </div>
     </div>
   )
