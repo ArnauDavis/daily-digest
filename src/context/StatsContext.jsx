@@ -76,9 +76,14 @@ export function StatsProvider({ children, session }) {
         addWaterStat: (payload) => handleAction(() => statsService.addStat('water', userId, payload), setWaterStat),
         addFoodStat: (payload) => handleAction(() => statsService.addStat('food', userId, payload), setFoodStat),
         
-        updatePeeStat: (id, payload) => handleAction(() => statsService.updateStat('pee', userId, id, payload), setPeeStat),
-        updateWaterStat: (id, payload) => handleAction(() => statsService.updateStat('water', userId, id, payload), setWaterStat),
-        updateFoodStat: (id, payload) => handleAction(() => statsService.updateStat('food', userId, id, payload), setFoodStat),
+        updatePeeStat: (id, amount, date, notes) => 
+            handleAction(() => statsService.updateStat('pee', userId, id, { pee_amount: amount, created_at: date, pee_notes: notes }), setPeeStat),
+
+        updateWaterStat: (id, amount, date, notes) => 
+            handleAction(() => statsService.updateStat('water', userId, id, { water_amount: amount, created_at: date, water_notes: notes }), setWaterStat),
+
+        updateFoodStat: (id, amount, date) => 
+            handleAction(() => statsService.updateStat('food', userId, id, { food_amount: amount, created_at: date }), setFoodStat),
         
         updateGoals: async (payload) => {
             const res = await statsService.addStat('goals', userId, payload) 
