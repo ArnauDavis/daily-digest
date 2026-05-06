@@ -71,7 +71,7 @@ import { useStats } from "../context/StatsContext.jsx"
     const { addPeeStat, addWaterStat, addFoodStat } = useStats()
 
     return (
-      <div className="w-full">
+      <div className="w-full mt-4">
         <div className="flex flex-col mb-12 ml-4">
           <span className="text-secondary font-bold tracking-[0.3em] text-[10px] uppercase mb-2">
             Entry No. {new Date().toLocaleDateString()}
