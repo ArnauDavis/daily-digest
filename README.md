@@ -22,23 +22,23 @@ As a user managing a medical condition or a strict fitness regimen, I need a fri
 
 ## How It Works:
 
-* Dashboard Snapshot: The top of the app displays a real-time "Daily Snapshot" of total intake (cc), total output (cc), and the calculated Net Balance.
+* Dashboard Snapshot: The top of the app displays a real time "Daily Snapshot" of total intake (cc), total output (cc), and the calculated Net Balance.
 
 * Quick Action Center: Users can instantly log urine output, water intake, or food entries using specialized input cards.
 
 * Historical Pattern Recognition: A collapsible history section groups data by date, allowing users to expand notes and edit past entries.
 
-* Adaptive Interface: The app features a high-end UI that shifts between Light and Dark modes to reduce eye strain during late-night logging.
+* Adaptive Interface: The app features a high end UI that shifts between Light and Dark modes to reduce eye strain during late night logging.
 
 ## How It's Made:
 
-Daily Digest was built using a Component-Driven Architecture. By breaking the UI into atomic pieces like StatChange and DailyStats, I ensured the codebase remains scalable and easy to debug.
+Daily Digest was built using a Component Driven Architecture. By breaking the UI into atomic pieces like StatChange and DailyStats, I ensured the codebase remains scalable and easy to debug.
 
-* Feature-Rich Interface: The app includes real-time calculation of fluid differentials, a sophisticated food journal with expandable note cards, and a paginated history log.
+* Feature Rich Interface: The app includes real time calculation of fluid differentials, a sophisticated food journal with expandable note cards, and a paginated history log.
 
-* Dual-Theming (Light/Dark): Utilizing Tailwind CSS and DaisyUI, I implemented a theme-switching system. This wasn't just for aesthetics; for users tracking medical data at night, the Dark Mode provides essential accessibility by reducing glare.
+* Dual Theming (Light/Dark): Utilizing Tailwind CSS and DaisyUI, I implemented a theme switching system. This wasn't just for aesthetics, but for users tracking medical data at night, the Dark Mode provides essential accessibility by reducing glare.
 
-* Medical Precision: Unlike standard fitness apps, I standardized all fluid inputs to cc (cubic centimeters) to ensure clinical-level data entry and zero ambiguity for the user.
+* Medical Precision: Unlike standard fitness apps, I standardized all fluid inputs to cc (cubic centimeters) to ensure clinical level data entry and zero ambiguity for the user.
 
 ## Optimizations:
 
@@ -46,7 +46,7 @@ While the current version of Daily Digest is fully functional, I have identified
 
 * Data Visualization: Integrating Chart.js to turn the historical tables into visual line graphs for easier pattern recognition.
 
-* Server-Side Pagination: As the user’s history grows into the thousands, I would move the pagination logic from the client-side to the backend to maintain lightning-fast load times.
+* Server Side Pagination: As the user’s history grows into the thousands, I would move the pagination logic from the client side to the backend to maintain lightning fast load times.
 
 * Push Notifications: Adding reminders for users to log their intake if a long period of inactivity is detected.
 
