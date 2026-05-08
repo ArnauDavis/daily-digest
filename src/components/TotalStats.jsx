@@ -31,12 +31,12 @@ function TotalStats() {
   // --- Goal Logic (Context based) ---
   const activeGoals = view === 'daily' 
     ? {
-        pee: goals?.daily_goal_pee || 50,
-        water: goals?.daily_goal_water || 64
+        pee: goals?.daily_goal_pee || 1300,
+        water: goals?.daily_goal_water || 3000
       }
     : {
-        pee: goals?.weekly_goal_pee || 350,
-        water: goals?.weekly_goal_water || 448
+        pee: goals?.weekly_goal_pee || 9100,
+        water: goals?.weekly_goal_water || 21000
       }
 
   // --- Lifetime Milestone Logic ---
