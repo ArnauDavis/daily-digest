@@ -1,6 +1,6 @@
 # Daily Digest
 
-A high-precision fluid and nutrition tracking dashboard designed for clinical accuracy and pattern recognition.
+A fluid and nutrition tracking dashboard that helps users monitor daily intake, output, and hydration patterns.
 
 
 
